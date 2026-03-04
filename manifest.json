@@ -1,0 +1,22 @@
+{
+  "name": "体重挑战",
+  "short_name": "体重挑战",
+  "description": "本地体重挑战赛管理工具",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f5f5f5",
+  "theme_color": "#07c160",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "static/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "static/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
