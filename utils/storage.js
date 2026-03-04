@@ -198,5 +198,7 @@ const Storage = {
   }
 };
 
-// 初始化
-Storage.init();
+// 浏览器环境才初始化
+if (typeof window !== 'undefined' && window.localStorage) {
+  Storage.init();
+}

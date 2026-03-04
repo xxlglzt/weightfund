@@ -1,11 +1,11 @@
-const CACHE_NAME = 'weight-challenge-v1';
+const CACHE_NAME = 'weight-challenge-v1.1';
 const urlsToCache = [
-  './',
-  './index.html',
-  './static/app.css',
-  './utils/storage.js',
-  './utils/calculator.js',
-  './app.js'
+  '/',
+  '/index.html',
+  '/static/app.css',
+  '/utils/storage.js',
+  '/utils/calculator.js',
+  '/app.js'
 ];
 
 self.addEventListener('install', (event) => {

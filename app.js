@@ -876,5 +876,18 @@ const App = {
 };
 
 // 启动应用
-window.addEventListener('hashchange', () => App.router());
-window.addEventListener('DOMContentLoaded', () => App.init());
+try {
+  window.addEventListener('hashchange', () => App.router());
+  window.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, initializing app...');
+    App.init();
+  });
+} catch (e) {
+  console.error('App initialization failed:', e);
+  document.getElementById('page-container').innerHTML = `
+    <div style="padding: 50px; text-align: center; color: #ff4d4f;">
+      <div style="font-size: 18px; margin-bottom: 10px;">⚠️ 加载失败</div>
+      <div style="font-size: 14px; color: #666;">${e.message}</div>
+    </div>
+  `;
+}
