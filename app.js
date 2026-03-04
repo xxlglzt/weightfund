@@ -4,12 +4,34 @@ const App = {
 
   // 初始化
   init() {
-    this.initStorage();
-    this.router();
+    try {
+      console.log('App.init() started');
+      this.initStorage();
+      console.log('Storage initialized');
+      this.router();
+      console.log('Router called');
+    } catch (e) {
+      console.error('App init error:', e);
+      this.showError('初始化失败: ' + e.message);
+    }
+  },
+
+  // 显示错误信息
+  showError(msg) {
+    document.getElementById('page-container').innerHTML = `
+      <div style="padding: 50px; text-align: center;">
+        <div style="font-size: 18px; color: #ff4d4f; margin-bottom: 10px;">⚠️ 出错了</div>
+        <div style="font-size: 14px; color: #666;">${msg}</div>
+        <pre style="font-size: 12px; color: #999; margin-top: 20px; text-align: left; background: #f5f5f5; padding: 10px; border-radius: 4px; overflow: auto;">${msg}</pre>
+      </div>
+    `;
   },
 
   // 确保存储初始化
   initStorage() {
+    if (typeof localStorage === 'undefined') {
+      throw new Error('浏览器不支持 localStorage');
+    }
     if (!localStorage.getItem('weight_challenge_data')) {
       localStorage.setItem('weight_challenge_data', JSON.stringify({
         competitions: [],
