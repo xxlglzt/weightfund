@@ -167,6 +167,10 @@ const App = {
             <span style="color: #999; font-size: 14px;">${competitions.length} 个</span>
           </div>
 
+          <div style="padding: 10px 0; border-bottom: 1px solid #f0f0f0;">
+            <button class="btn btn-secondary btn-sm" onclick="App.showGlobalImport()">📥 导入比赛</button>
+          </div>
+
           ${competitions.length === 0 ? `
             <div class="empty-state">
               <div class="empty-icon">📋</div>
@@ -885,9 +889,86 @@ const App = {
 
   copyExportData() {
     const textarea = document.getElementById('exportData');
+    const text = textarea.value;
+
+    // 使用现代 Clipboard API，支持移动端
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        this.toast('已复制到剪贴板');
+      }).catch(() => {
+        // 降级方案
+        this.fallbackCopy(textarea);
+      });
+    } else {
+      // 旧浏览器降级
+      this.fallbackCopy(textarea);
+    }
+  },
+
+  // 降级复制方案
+  fallbackCopy(textarea) {
     textarea.select();
-    document.execCommand('copy');
-    this.toast('已复制到剪贴板');
+    textarea.setSelectionRange(0, 99999); // 移动端兼容
+    try {
+      const successful = document.execCommand('copy');
+      if (successful) {
+        this.toast('已复制到剪贴板');
+      } else {
+        this.toast('复制失败，请手动复制');
+      }
+    } catch (err) {
+      this.toast('复制失败，请手动复制');
+    }
+  },
+
+  // 全局导入页面（首页入口）
+  showGlobalImport() {
+    document.getElementById('page-container').innerHTML = `
+      <div class="page">
+        <div class="navbar">
+          <div class="navbar-back" onclick="App.goBack()">‹</div>
+          <div class="navbar-title">导入比赛</div>
+          <span></span>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="margin-bottom: 12px;">📥 导入比赛数据</div>
+          <p style="font-size: 14px; color: #666; margin-bottom: 12px; line-height: 1.6;">
+            粘贴朋友分享的比赛数据（JSON格式），即可在本地查看该比赛。
+          </p>
+          <textarea class="textarea-export" id="globalImportData" placeholder="请粘贴比赛数据JSON..."></textarea>
+          <button class="btn btn-primary btn-block" style="margin-top: 12px;" onclick="App.submitGlobalImport()">
+            导入比赛
+          </button>
+        </div>
+
+        <div class="card" style="background: #f6ffed;">
+          <div style="font-size: 14px; color: #666; line-height: 1.6;">
+            <strong>💡 提示：</strong><br>
+            • 导入后会添加到你的比赛列表<br>
+            • 导入同一比赛会覆盖本地数据<br>
+            • 所有数据仍存储在本地浏览器中
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
+  // 全局导入提交
+  submitGlobalImport() {
+    const data = document.getElementById('globalImportData').value.trim();
+    if (!data) {
+      this.toast('请粘贴数据');
+      return;
+    }
+
+    const result = Storage.importCompetition(data);
+    if (result.success) {
+      this.toast('导入成功');
+      setTimeout(() => this.navigateTo('competition/' + result.data._id), 500);
+    } else {
+      this.toast(result.msg);
+    }
   },
 
   submitImport() {

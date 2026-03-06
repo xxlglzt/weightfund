@@ -335,6 +335,23 @@ body {
   display: flex;
   gap: 10px;
   padding: 15px;
+  flex-wrap: wrap;
+}
+
+.data-actions .btn {
+  flex: 1 1 auto;
+  min-width: 80px;
+}
+
+/* 导入按钮样式 */
+.import-section {
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 15px;
+}
+
+.import-section .btn {
+  width: 100%;
 }
 
 .textarea-export {
@@ -418,7 +435,7 @@ body {
   margin-top: 2px;
 }
 
-/* 响应式 */
+/* 响应式 - 小屏手机 (iPhone SE 等) */
 @media (max-width: 375px) {
   .card {
     margin: 8px 10px;
@@ -432,5 +449,83 @@ body {
 
   .stat-value {
     font-size: 20px;
+  }
+
+  .data-actions {
+    flex-wrap: wrap;
+  }
+
+  .data-actions .btn {
+    flex: 1 1 calc(50% - 5px);
+    min-width: 80px;
+    margin-bottom: 8px;
+  }
+}
+
+/* 响应式 - 标准手机 (iPhone 12/13/14 等 390px-428px) */
+@media (min-width: 376px) and (max-width: 428px) {
+  .card {
+    margin: 10px 12px;
+    padding: 15px;
+  }
+
+  .stats-row {
+    margin: 10px 12px;
+    padding: 20px 15px;
+  }
+
+  .stat-value {
+    font-size: 24px;
+  }
+
+  .navbar-title {
+    font-size: 17px;
+  }
+}
+
+/* 响应式 - 大屏手机/平板 */
+@media (min-width: 429px) {
+  .card {
+    max-width: 600px;
+    margin: 12px auto;
+  }
+
+  .stats-row {
+    max-width: 600px;
+    margin: 12px auto;
+  }
+
+  .list {
+    max-width: 600px;
+    margin: 10px auto;
+  }
+
+  .navbar {
+    padding: 15px 20px;
+  }
+
+  .navbar-title {
+    font-size: 19px;
+  }
+
+  .page {
+    max-width: 600px;
+    margin: 0 auto;
+    background: #f5f5f5;
+  }
+}
+
+/* 横屏模式优化 */
+@media (max-height: 500px) and (orientation: landscape) {
+  .fab {
+    bottom: 15px;
+    right: 15px;
+    width: 48px;
+    height: 48px;
+    font-size: 20px;
+  }
+
+  .navbar {
+    padding: 10px 15px;
   }
 }
