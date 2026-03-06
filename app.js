@@ -586,11 +586,11 @@ const App = {
         <div class="card">
           <div class="form-group">
             <label class="form-label">选择参与者</label>
-            <select class="form-input" id="participantSelect" onchange="App.onParticipantChange('${competitionId}')">
+            <select class="form-input" id="participantSelect" onchange="App.onParticipantChange('${competitionId}')" style="width: 100%;">
               <option value="">请选择</option>
               ${competition.participants.map(p => `
                 <option value="${p.id}" data-initial="${p.initialWeight}" data-target="${p.targetWeight}" data-current="${p.currentWeight}">
-                  ${escapeHtml(p.name)} (当前: ${p.currentWeight}kg)
+                  ${escapeHtml(p.name)} (${p.currentWeight}kg)
                 </option>
               `).join('')}
             </select>
@@ -611,14 +611,12 @@ const App = {
 
           <div class="form-group">
             <label class="form-label">体重 (kg)</label>
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <button class="btn btn-secondary btn-sm" onclick="App.adjustWeight(-0.5)">-0.5</button>
-              <input type="number" class="form-input" id="weight" placeholder="0.0" step="0.1" style="flex: 1; text-align: center;">
-              <button class="btn btn-secondary btn-sm" onclick="App.adjustWeight(0.5)">+0.5</button>
+            <div class="actions-row" style="margin-bottom: 8px;">
+              <button class="btn btn-secondary" onclick="App.adjustWeight(-0.5)" style="flex: 0 0 auto; padding: 12px 16px;">-0.5</button>
+              <input type="number" class="form-input" id="weight" placeholder="0.0" step="0.1" style="flex: 1; text-align: center; min-width: 80px;">
+              <button class="btn btn-secondary" onclick="App.adjustWeight(0.5)" style="flex: 0 0 auto; padding: 12px 16px;">+0.5</button>
             </div>
-            <div style="display: flex; gap: 10px; margin-top: 8px;">
-              <button class="btn btn-secondary btn-sm" style="flex: 1;" onclick="App.resetWeight()">重置</button>
-            </div>
+            <button class="btn btn-secondary btn-block" onclick="App.resetWeight()">重置</button>
           </div>
 
           <div id="weightChange" class="card card-flat" style="display: none; text-align: center;">
