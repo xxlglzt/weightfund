@@ -1,3 +1,12 @@
+// HTML 转义函数，防止 XSS 攻击
+const escapeHtml = (text) => {
+  if (text == null) return '';
+  const str = String(text);
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+};
+
 // 主应用逻辑
 const App = {
   currentPage: '',
@@ -21,8 +30,8 @@ const App = {
     document.getElementById('page-container').innerHTML = `
       <div style="padding: 50px; text-align: center;">
         <div style="font-size: 18px; color: #ff4d4f; margin-bottom: 10px;">⚠️ 出错了</div>
-        <div style="font-size: 14px; color: #666;">${msg}</div>
-        <pre style="font-size: 12px; color: #999; margin-top: 20px; text-align: left; background: #f5f5f5; padding: 10px; border-radius: 4px; overflow: auto;">${msg}</pre>
+        <div style="font-size: 14px; color: #666;">${escapeHtml(msg)}</div>
+        <pre style="font-size: 12px; color: #999; margin-top: 20px; text-align: left; background: #f5f5f5; padding: 10px; border-radius: 4px; overflow: auto;">${escapeHtml(msg)}</pre>
       </div>
     `;
   },
@@ -103,8 +112,8 @@ const App = {
     modal.className = 'modal-overlay';
     modal.innerHTML = `
       <div class="modal-content">
-        <div class="modal-title">${title}</div>
-        <div class="modal-text">${content}</div>
+        <div class="modal-title">${escapeHtml(title)}</div>
+        <div class="modal-text">${escapeHtml(content)}</div>
         <div class="modal-actions">
           <button class="btn btn-secondary btn-block" id="btn-cancel">取消</button>
           <button class="btn btn-primary btn-block" id="btn-confirm">确定</button>
@@ -178,7 +187,7 @@ const App = {
                 return `
                   <div class="list-item" onclick="App.navigateTo('competition/${c._id}')">
                     <div>
-                      <div style="font-weight: 600;">${c.name}</div>
+                      <div style="font-weight: 600;">${escapeHtml(c.name)}</div>
                       <div style="font-size: 12px; color: #999; margin-top: 4px;">
                         ${Calculator.formatDate(c.startDate)} - ${Calculator.formatDate(c.endDate)}
                       </div>
@@ -225,7 +234,7 @@ const App = {
         <div class="card">
           <div class="form-group">
             <label class="form-label">比赛名称</label>
-            <input type="text" class="form-input" id="name" placeholder="例如：春节减重挑战">
+            <input type="text" class="form-input" id="name" placeholder="例如：春节减重挑战" maxlength="50">
           </div>
 
           <div class="form-group">
@@ -251,7 +260,8 @@ const App = {
 
   // 提交创建
   submitCreate() {
-    const name = document.getElementById('name').value.trim();
+    const nameInput = document.getElementById('name');
+    const name = nameInput ? nameInput.value.trim() : '';
     const startDate = document.getElementById('startDate').value;
     const endDate = document.getElementById('endDate').value;
     const maxParticipants = document.getElementById('maxParticipants').value;
@@ -316,7 +326,7 @@ const App = {
       <div class="page">
         <div class="navbar">
           <div class="navbar-back" onclick="App.goBack()">‹</div>
-          <div class="navbar-title">${competition.name}</div>
+          <div class="navbar-title">${escapeHtml(competition.name)}</div>
           <span></span>
         </div>
 
@@ -379,7 +389,7 @@ const App = {
                     <div style="display: flex; align-items: center; flex: 1;">
                       <div class="rank-number ${index < 3 ? 'top3' : ''}">${index + 1}</div>
                       <div class="rank-info">
-                        <div class="rank-name">${p.name} ${p.gender === 'male' ? '♂' : p.gender === 'female' ? '♀' : ''}</div>
+                        <div class="rank-name">${escapeHtml(p.name)} ${p.gender === 'male' ? '♂' : p.gender === 'female' ? '♀' : ''}</div>
                         <div class="rank-progress">
                           ${isWeightLoss ? '↓' : '↑'} ${Math.abs(p.initialWeight - p.currentWeight).toFixed(1)}kg / 目标${Math.abs(p.initialWeight - p.targetWeight).toFixed(1)}kg
                           (${p.progress.toFixed(0)}%)
@@ -461,7 +471,7 @@ const App = {
         <div class="card">
           <div class="form-group">
             <label class="form-label">姓名</label>
-            <input type="text" class="form-input" id="name" placeholder="请输入姓名">
+            <input type="text" class="form-input" id="name" placeholder="请输入姓名" maxlength="20">
           </div>
 
           <div class="form-group">
@@ -612,7 +622,7 @@ const App = {
               <option value="">请选择</option>
               ${competition.participants.map(p => `
                 <option value="${p.id}" data-initial="${p.initialWeight}" data-target="${p.targetWeight}" data-current="${p.currentWeight}">
-                  ${p.name} (当前: ${p.currentWeight}kg)
+                  ${escapeHtml(p.name)} (当前: ${p.currentWeight}kg)
                 </option>
               `).join('')}
             </select>
@@ -786,7 +796,7 @@ const App = {
             if (records.length === 0) {
               return `
                 <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #f0f0f0;">
-                  <div style="font-weight: 600; margin-bottom: 8px;">${p.name}</div>
+                  <div style="font-weight: 600; margin-bottom: 8px;">${escapeHtml(p.name)}</div>
                   <div style="color: #999; font-size: 14px;">暂无记录</div>
                 </div>
               `;
@@ -799,7 +809,7 @@ const App = {
 
             return `
               <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #f0f0f0;">
-                <div style="font-weight: 600; margin-bottom: 8px;">${p.name}: ${p.initialWeight}kg → ${p.currentWeight}kg</div>
+                <div style="font-weight: 600; margin-bottom: 8px;">${escapeHtml(p.name)}: ${p.initialWeight}kg → ${p.currentWeight}kg</div>
                 <div style="display: flex; align-items: flex-end; height: 100px; gap: 4px; padding: 10px 0;">
                   ${sorted.map((r, i) => {
                     const height = ((r.weight - minWeight) / range) * 80 + 10;
@@ -909,7 +919,7 @@ try {
   document.getElementById('page-container').innerHTML = `
     <div style="padding: 50px; text-align: center; color: #ff4d4f;">
       <div style="font-size: 18px; margin-bottom: 10px;">⚠️ 加载失败</div>
-      <div style="font-size: 14px; color: #666;">${e.message}</div>
+      <div style="font-size: 14px; color: #666;">${escapeHtml(e.message)}</div>
     </div>
   `;
 }
