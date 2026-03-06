@@ -146,68 +146,61 @@ const App = {
           <span></span>
         </div>
 
-        <div class="stats-row">
-          <div class="stat-item">
-            <div class="stat-value">${competitions.length}</div>
-            <div class="stat-label">我的比赛</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value">${totalParticipants}</div>
-            <div class="stat-label">参与人数</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value">¥${totalFund.toFixed(0)}</div>
-            <div class="stat-label">总奖金</div>
+        <div class="card card-flat">
+          <div class="stats-grid">
+            <div class="stat-item">
+              <div class="stat-value">${competitions.length}</div>
+              <div class="stat-label">比赛</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">${totalParticipants}</div>
+              <div class="stat-label">参与者</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">¥${totalFund.toFixed(0)}</div>
+              <div class="stat-label">总奖金</div>
+            </div>
           </div>
         </div>
 
         <div class="card">
-          <div class="card-header">
-            <span class="card-title">我的比赛</span>
-            <span style="color: #999; font-size: 14px;">${competitions.length} 个</span>
-          </div>
-
-          <div style="padding: 10px 0; border-bottom: 1px solid #f0f0f0;">
-            <button class="btn btn-secondary btn-sm" onclick="App.showGlobalImport()">📥 导入比赛</button>
+          <div class="import-section">
+            <button class="btn btn-secondary btn-sm" onclick="App.showGlobalImport()">
+              <span>↓</span> 导入比赛
+            </button>
           </div>
 
           ${competitions.length === 0 ? `
             <div class="empty-state">
-              <div class="empty-icon">📋</div>
-              <p>还没有创建比赛</p>
-              <p style="font-size: 12px; margin-top: 8px;">点击右下角创建</p>
+              <div class="empty-icon">⊘</div>
+              <div class="empty-title">暂无比赛</div>
+              <p>点击右下角创建新比赛</p>
             </div>
           ` : `
-            <div class="list" style="margin: 0;">
+            <div class="list">
               ${competitions.map(c => {
                 const fund = Calculator.calculateFund(c);
                 const progress = Calculator.getProgressPercent(c.startDate, c.endDate);
-                const statusText = {
-                  'registering': '报名中',
-                  'ongoing': '进行中',
-                  'ended': '已结束'
-                }[c.status] || c.status;
+                const statusClass = c.status === 'registering' ? 'primary' : c.status === 'ongoing' ? 'success' : 'warning';
+                const statusText = { 'registering': '报名中', 'ongoing': '进行中', 'ended': '已结束' }[c.status] || c.status;
 
                 return `
                   <div class="list-item" onclick="App.navigateTo('competition/${c._id}')">
-                    <div>
-                      <div style="font-weight: 600;">${escapeHtml(c.name)}</div>
-                      <div style="font-size: 12px; color: #999; margin-top: 4px;">
+                    <div class="list-item-content">
+                      <div class="list-item-title">${escapeHtml(c.name)}</div>
+                      <div class="list-item-meta">
                         ${Calculator.formatDate(c.startDate)} - ${Calculator.formatDate(c.endDate)}
-                      </div>
-                      <div style="margin-top: 8px;">
-                        <span class="tag tag-${c.status === 'registering' ? 'primary' : c.status === 'ongoing' ? 'success' : 'warning'}">${statusText}</span>
-                        <span style="font-size: 12px; color: #666; margin-left: 8px;">${c.participants?.length || 0}人参与</span>
+                        · ${c.participants?.length || 0}人
                       </div>
                       ${c.status === 'ongoing' ? `
-                        <div class="progress-bar" style="margin-top: 8px;">
+                        <div class="progress-bar">
                           <div class="progress-fill" style="width: ${progress}%"></div>
                         </div>
                       ` : ''}
                     </div>
-                    <div style="text-align: right;">
-                      <div style="color: #07c160; font-weight: 600;">¥${fund.totalFund.toFixed(0)}</div>
-                      <div style="font-size: 12px; color: #999;">奖池</div>
+                    <div style="text-align: right; margin-left: 12px;">
+                      <div style="font-size: 17px; font-weight: 600;">¥${fund.totalFund.toFixed(0)}</div>
+                      <span class="tag tag-${statusClass}">${statusText}</span>
                     </div>
                   </div>
                 `;
@@ -320,11 +313,8 @@ const App = {
     const ranking = Calculator.calculateRanking(competition);
     const rewards = Calculator.calculateRewards(competition);
 
-    const statusText = {
-      'registering': '报名中',
-      'ongoing': '进行中',
-      'ended': '已结束'
-    }[competition.status] || competition.status;
+    const statusClass = competition.status === 'registering' ? 'primary' : competition.status === 'ongoing' ? 'success' : 'warning';
+    const statusText = { 'registering': '报名中', 'ongoing': '进行中', 'ended': '已结束' }[competition.status] || competition.status;
 
     document.getElementById('page-container').innerHTML = `
       <div class="page">
@@ -334,24 +324,22 @@ const App = {
           <span></span>
         </div>
 
-        <div class="card">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <span class="tag tag-${competition.status === 'registering' ? 'primary' : competition.status === 'ongoing' ? 'success' : 'warning'}">${statusText}</span>
-            </div>
-            <div style="font-size: 12px; color: #999;">
+        <div class="card card-flat">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <span class="tag tag-${statusClass}">${statusText}</span>
+            <span style="font-size: 13px; color: var(--color-text-secondary);">
               ${Calculator.formatDate(competition.startDate)} - ${Calculator.formatDate(competition.endDate)}
-            </div>
+            </span>
           </div>
 
-          <div class="stats-row" style="margin: 15px 0 0; padding: 15px 0; background: #f9f9f9; border-radius: 8px;">
+          <div class="stats-grid">
             <div class="stat-item">
               <div class="stat-value">${fund.totalFundText}</div>
               <div class="stat-label">总奖金</div>
             </div>
             <div class="stat-item">
               <div class="stat-value">${fund.participantCount}</div>
-              <div class="stat-label">参与人数</div>
+              <div class="stat-label">参与者</div>
             </div>
             <div class="stat-item">
               <div class="stat-value">${Calculator.getRemainingDays(competition.endDate)}</div>
@@ -359,15 +347,15 @@ const App = {
             </div>
           </div>
 
-          <div class="data-actions" style="padding: 15px 0 0; margin: 0;">
+          <div class="actions-row" style="margin-top: 20px;">
             ${competition.status === 'registering' && competition.participants.length >= 2 ? `
-              <button class="btn btn-primary btn-sm" onclick="App.startCompetition('${id}')">开始比赛</button>
+              <button class="btn btn-primary" onclick="App.startCompetition('${id}')">开始比赛</button>
             ` : ''}
             ${competition.status === 'ongoing' ? `
-              <button class="btn btn-danger btn-sm" onclick="App.endCompetition('${id}')">结束比赛</button>
+              <button class="btn btn-danger" onclick="App.endCompetition('${id}')">结束比赛</button>
             ` : ''}
-            <button class="btn btn-secondary btn-sm" onclick="App.navigateTo('export/${id}')">导出/分享</button>
-            <button class="btn btn-secondary btn-sm" onclick="App.deleteCompetition('${id}')">删除</button>
+            <button class="btn btn-secondary" onclick="App.navigateTo('export/${id}')">导出</button>
+            <button class="btn btn-ghost" onclick="App.deleteCompetition('${id}')">删除</button>
           </div>
         </div>
 
@@ -380,34 +368,33 @@ const App = {
           </div>
 
           ${competition.participants.length === 0 ? `
-            <div class="empty-state" style="padding: 30px;">
-              <p>还没有参与者</p>
-              <p style="font-size: 12px; color: #999; margin-top: 8px;">点击右上角添加</p>
+            <div class="empty-state">
+              <div class="empty-icon">⊘</div>
+              <div class="empty-title">暂无参与者</div>
+              <p>点击右上角添加参与者</p>
             </div>
           ` : `
-            <div class="list" style="margin: 0;">
+            <div class="list">
               ${ranking.map((p, index) => {
                 const isWeightLoss = p.targetWeight < p.initialWeight;
+                const reward = competition.status === 'ended' && rewards.length > 0 ? rewards.find(r => r.id === p.id) : null;
                 return `
                   <div class="list-item" onclick="App.navigateTo('record/${id}')">
-                    <div style="display: flex; align-items: center; flex: 1;">
-                      <div class="rank-number ${index < 3 ? 'top3' : ''}">${index + 1}</div>
-                      <div class="rank-info">
-                        <div class="rank-name">${escapeHtml(p.name)} ${p.gender === 'male' ? '♂' : p.gender === 'female' ? '♀' : ''}</div>
-                        <div class="rank-progress">
-                          ${isWeightLoss ? '↓' : '↑'} ${Math.abs(p.initialWeight - p.currentWeight).toFixed(1)}kg / 目标${Math.abs(p.initialWeight - p.targetWeight).toFixed(1)}kg
-                          (${p.progress.toFixed(0)}%)
-                        </div>
+                    <div class="rank-number ${index < 3 ? 'top3' : ''}">${index + 1}</div>
+                    <div class="rank-info">
+                      <div class="rank-name">${escapeHtml(p.name)} ${p.gender === 'male' ? '♂' : p.gender === 'female' ? '♀' : ''}</div>
+                      <div class="rank-meta">
+                        ${isWeightLoss ? '↓' : '↑'} ${Math.abs(p.initialWeight - p.currentWeight).toFixed(1)}kg / ${Math.abs(p.initialWeight - p.targetWeight).toFixed(1)}kg · ${p.progress.toFixed(0)}%
                       </div>
                     </div>
-                    <div style="text-align: right;">
-                      <div style="font-weight: 600;">${p.currentWeight}kg</div>
-                      <div style="font-size: 12px; color: ${p.isCompleted ? '#52c41a' : '#999'};">
-                        ${p.isCompleted ? '✓ 已达标' : '○ 未达标'}
+                    <div style="text-align: right; margin-left: 12px;">
+                      <div style="font-size: 17px; font-weight: 600;">${p.currentWeight}kg</div>
+                      <div style="font-size: 12px; color: ${p.isCompleted ? 'var(--color-success)' : 'var(--color-text-secondary)'}; font-weight: 500;">
+                        ${p.isCompleted ? '✓ 已达标' : '○ 进行中'}
                       </div>
-                      ${competition.status === 'ended' && rewards.length > 0 ? `
-                        <div style="font-size: 12px; color: ${rewards.find(r => r.id === p.id)?.profit >= 0 ? '#52c41a' : '#ff4d4f'};">
-                          ${rewards.find(r => r.id === p.id)?.rewardText || ''}
+                      ${reward ? `
+                        <div style="font-size: 13px; color: ${reward.profit >= 0 ? 'var(--color-success)' : '#ff3b30'}; font-weight: 500; margin-top: 2px;">
+                          ${reward.profit >= 0 ? '+' : ''}${reward.profit.toFixed(0)}元
                         </div>
                       ` : ''}
                     </div>
@@ -501,9 +488,9 @@ const App = {
             <input type="number" class="form-input" id="investment" placeholder="例如：100" min="1">
           </div>
 
-          <div id="preview" style="display: none; background: #f0f8f0; padding: 12px; border-radius: 8px; margin-bottom: 16px;">
-            <div style="font-size: 14px; color: #666;">
-              计划<span id="preview-action"></span>: <span id="preview-amount" style="font-weight: 600; color: #07c160;"></span>kg
+          <div id="preview" class="card card-flat" style="display: none;">
+            <div style="font-size: 14px; color: var(--color-text-secondary);">
+              计划<span id="preview-action"></span> <span id="preview-amount" style="font-weight: 600; color: var(--color-accent);"></span>kg
               (<span id="preview-percent"></span>%)
             </div>
           </div>
@@ -632,10 +619,10 @@ const App = {
             </select>
           </div>
 
-          <div id="participantInfo" style="display: none; background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 16px;">
-            <div style="display: flex; justify-content: space-between; font-size: 14px;">
-              <span>初始: <strong id="infoInitial"></strong>kg</span>
-              <span>目标: <strong id="infoTarget"></strong>kg</span>
+          <div id="participantInfo" class="card card-flat" style="display: none;">
+            <div style="display: flex; justify-content: space-between; font-size: 14px; color: var(--color-text-secondary);">
+              <span>初始 <strong id="infoInitial" style="color: var(--color-text);"></strong>kg</span>
+              <span>目标 <strong id="infoTarget" style="color: var(--color-text);"></strong>kg</span>
               <span id="infoChange"></span>
             </div>
           </div>
@@ -657,7 +644,7 @@ const App = {
             </div>
           </div>
 
-          <div id="weightChange" style="display: none; text-align: center; padding: 10px; background: #f0f8f0; border-radius: 8px; margin-bottom: 16px;">
+          <div id="weightChange" class="card card-flat" style="display: none; text-align: center;">
             <span id="changeText"></span>
           </div>
 
@@ -799,9 +786,9 @@ const App = {
             const records = competition.weightRecords?.[p.id] || [];
             if (records.length === 0) {
               return `
-                <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #f0f0f0;">
-                  <div style="font-weight: 600; margin-bottom: 8px;">${escapeHtml(p.name)}</div>
-                  <div style="color: #999; font-size: 14px;">暂无记录</div>
+                <div class="chart-container" style="border-bottom: 1px solid var(--color-border); margin-bottom: 20px; padding-bottom: 20px;">
+                  <div class="rank-name" style="margin-bottom: 8px;">${escapeHtml(p.name)}</div>
+                  <div class="list-item-meta">暂无记录</div>
                 </div>
               `;
             }
@@ -812,16 +799,16 @@ const App = {
             const range = maxWeight - minWeight || 1;
 
             return `
-              <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #f0f0f0;">
-                <div style="font-weight: 600; margin-bottom: 8px;">${escapeHtml(p.name)}: ${p.initialWeight}kg → ${p.currentWeight}kg</div>
-                <div style="display: flex; align-items: flex-end; height: 100px; gap: 4px; padding: 10px 0;">
+              <div class="chart-container" style="border-bottom: 1px solid var(--color-border); margin-bottom: 20px; padding-bottom: 20px;">
+                <div class="rank-name" style="margin-bottom: 8px;">${escapeHtml(p.name)} · ${p.initialWeight}kg → ${p.currentWeight}kg</div>
+                <div class="chart-bar">
                   ${sorted.map((r, i) => {
                     const height = ((r.weight - minWeight) / range) * 80 + 10;
                     const isTarget = Math.abs(r.weight - p.targetWeight) < 0.1;
                     return `
                       <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
-                        <div style="width: 100%; height: ${height}px; background: ${isTarget ? '#52c41a' : '#07c160'}; border-radius: 2px; min-width: 8px;"></div>
-                        <div style="font-size: 10px; color: #999; margin-top: 4px;">${r.date.slice(5)}</div>
+                        <div class="chart-bar-item" style="height: ${height}px; background: ${isTarget ? 'var(--color-success)' : 'var(--color-accent)'};"></div>
+                        <div class="chart-label">${r.date.slice(5)}</div>
                       </div>
                     `;
                   }).join('')}
@@ -854,33 +841,30 @@ const App = {
         </div>
 
         <div class="card">
-          <div class="card-title" style="margin-bottom: 12px;">导出比赛数据</div>
-          <p style="font-size: 14px; color: #666; margin-bottom: 12px;">
-            复制以下文本，发送给朋友即可导入此比赛。
+          <div class="card-title" style="margin-bottom: 12px;">↑ 导出</div>
+          <p style="font-size: 14px; color: var(--color-text-secondary); margin-bottom: 12px; line-height: 1.5;">
+            复制下方数据，发送给朋友即可导入。
           </p>
           <textarea class="textarea-export" id="exportData" readonly>${jsonData}</textarea>
-          <button class="btn btn-primary btn-block" style="margin-top: 12px;" onclick="App.copyExportData()">
-            复制数据
+          <button class="btn btn-primary btn-block" style="margin-top: 16px;" onclick="App.copyExportData()">
+            复制到剪贴板
           </button>
         </div>
 
         <div class="card">
-          <div class="card-title" style="margin-bottom: 12px;">导入比赛数据</div>
-          <p style="font-size: 14px; color: #666; margin-bottom: 12px;">
-            粘贴朋友发来的比赛数据，点击导入。
+          <div class="card-title" style="margin-bottom: 12px;">↓ 导入</div>
+          <p style="font-size: 14px; color: var(--color-text-secondary); margin-bottom: 12px; line-height: 1.5;">
+            粘贴朋友分享的数据，导入此比赛。
           </p>
-          <textarea class="textarea-export" id="importData" placeholder="粘贴比赛数据JSON在这里..."></textarea>
-          <button class="btn btn-primary btn-block" style="margin-top: 12px;" onclick="App.submitImport()">
+          <textarea class="textarea-export" id="importData" placeholder="粘贴比赛数据..."></textarea>
+          <button class="btn btn-primary btn-block" style="margin-top: 16px;" onclick="App.submitImport()">
             导入数据
           </button>
         </div>
 
-        <div class="card" style="background: #fff7e6;">
-          <div style="font-size: 14px; color: #666;">
-            <strong>提示：</strong><br>
-            • 导出的数据可以通过微信、邮件等方式分享<br>
-            • 导入同一比赛会覆盖本地数据<br>
-            • 所有数据存储在本地浏览器中
+        <div class="card card-flat">
+          <div style="font-size: 13px; color: var(--color-text-secondary); line-height: 1.6;">
+            提示：导入会覆盖本地同名比赛数据，所有数据仅存储在浏览器本地。
           </div>
         </div>
       </div>
@@ -932,22 +916,19 @@ const App = {
         </div>
 
         <div class="card">
-          <div class="card-title" style="margin-bottom: 12px;">📥 导入比赛数据</div>
-          <p style="font-size: 14px; color: #666; margin-bottom: 12px; line-height: 1.6;">
-            粘贴朋友分享的比赛数据（JSON格式），即可在本地查看该比赛。
+          <div class="card-title" style="margin-bottom: 12px;">↓ 导入</div>
+          <p style="font-size: 14px; color: var(--color-text-secondary); margin-bottom: 12px; line-height: 1.5;">
+            粘贴朋友分享的比赛数据，即可在本地查看。
           </p>
-          <textarea class="textarea-export" id="globalImportData" placeholder="请粘贴比赛数据JSON..."></textarea>
-          <button class="btn btn-primary btn-block" style="margin-top: 12px;" onclick="App.submitGlobalImport()">
+          <textarea class="textarea-export" id="globalImportData" placeholder="粘贴比赛数据..."></textarea>
+          <button class="btn btn-primary btn-block" style="margin-top: 16px;" onclick="App.submitGlobalImport()">
             导入比赛
           </button>
         </div>
 
-        <div class="card" style="background: #f6ffed;">
-          <div style="font-size: 14px; color: #666; line-height: 1.6;">
-            <strong>💡 提示：</strong><br>
-            • 导入后会添加到你的比赛列表<br>
-            • 导入同一比赛会覆盖本地数据<br>
-            • 所有数据仍存储在本地浏览器中
+        <div class="card card-flat">
+          <div style="font-size: 13px; color: var(--color-text-secondary); line-height: 1.6;">
+            导入后会添加到你的比赛列表。导入同一比赛会覆盖本地数据。
           </div>
         </div>
       </div>
