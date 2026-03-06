@@ -231,8 +231,8 @@ body {
   background: var(--color-bg);
   padding: var(--spacing-sm);
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: var(--spacing-sm);
   cursor: pointer;
   transition: background 0.15s;
 }
@@ -243,6 +243,7 @@ body {
 
 .list-item-content {
   flex: 1;
+  min-width: 0;
 }
 
 .list-item-title {
@@ -493,29 +494,6 @@ body {
   min-width: 100px;
 }
 
-/* ===== 性别选择 ===== */
-.gender-select {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--spacing-xs);
-}
-
-.gender-option {
-  padding: var(--spacing-sm);
-  border: 2px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-weight: 500;
-}
-
-.gender-option.active {
-  border-color: var(--color-accent);
-  background: rgba(0, 113, 227, 0.05);
-  color: var(--color-accent);
-}
-
 /* ===== 排名列表 ===== */
 .rank-item {
   display: flex;
@@ -544,6 +522,7 @@ body {
 
 .rank-info {
   flex: 1;
+  min-width: 0;
 }
 
 .rank-name {

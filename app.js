@@ -186,7 +186,7 @@ const App = {
 
                 return `
                   <div class="list-item" onclick="App.navigateTo('competition/${c._id}')">
-                    <div class="list-item-content">
+                    <div class="list-item-content" style="flex: 1; min-width: 0;">
                       <div class="list-item-title">${escapeHtml(c.name)}</div>
                       <div class="list-item-meta">
                         ${Calculator.formatDate(c.startDate)} - ${Calculator.formatDate(c.endDate)}
@@ -198,8 +198,8 @@ const App = {
                         </div>
                       ` : ''}
                     </div>
-                    <div style="text-align: right; margin-left: 12px;">
-                      <div style="font-size: 17px; font-weight: 600;">¥${fund.totalFund.toFixed(0)}</div>
+                    <div style="text-align: right; margin-left: 16px; flex-shrink: 0;">
+                      <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">¥${fund.totalFund.toFixed(0)}</div>
                       <span class="tag tag-${statusClass}">${statusText}</span>
                     </div>
                   </div>
@@ -381,14 +381,14 @@ const App = {
                 return `
                   <div class="list-item" onclick="App.navigateTo('record/${id}')">
                     <div class="rank-number ${index < 3 ? 'top3' : ''}">${index + 1}</div>
-                    <div class="rank-info">
-                      <div class="rank-name">${escapeHtml(p.name)} ${p.gender === 'male' ? '♂' : p.gender === 'female' ? '♀' : ''}</div>
+                    <div class="rank-info" style="flex: 1; min-width: 0;">
+                      <div class="rank-name">${escapeHtml(p.name)}</div>
                       <div class="rank-meta">
                         ${isWeightLoss ? '↓' : '↑'} ${Math.abs(p.initialWeight - p.currentWeight).toFixed(1)}kg / ${Math.abs(p.initialWeight - p.targetWeight).toFixed(1)}kg · ${p.progress.toFixed(0)}%
                       </div>
                     </div>
-                    <div style="text-align: right; margin-left: 12px;">
-                      <div style="font-size: 17px; font-weight: 600;">${p.currentWeight}kg</div>
+                    <div style="text-align: right; margin-left: 16px; flex-shrink: 0;">
+                      <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">${p.currentWeight}kg</div>
                       <div style="font-size: 12px; color: ${p.isCompleted ? 'var(--color-success)' : 'var(--color-text-secondary)'}; font-weight: 500;">
                         ${p.isCompleted ? '✓ 已达标' : '○ 进行中'}
                       </div>
@@ -466,14 +466,6 @@ const App = {
           </div>
 
           <div class="form-group">
-            <label class="form-label">性别</label>
-            <div class="gender-select">
-              <div class="gender-option" data-gender="male" onclick="App.selectGender('male')">♂ 男</div>
-              <div class="gender-option" data-gender="female" onclick="App.selectGender('female')">♀ 女</div>
-            </div>
-          </div>
-
-          <div class="form-group">
             <label class="form-label">初始体重 (kg)</label>
             <input type="number" class="form-input" id="initialWeight" placeholder="例如：70.5" step="0.1">
           </div>
@@ -506,15 +498,6 @@ const App = {
     });
   },
 
-  selectedGender: '',
-
-  selectGender(gender) {
-    this.selectedGender = gender;
-    document.querySelectorAll('.gender-option').forEach(el => {
-      el.classList.toggle('active', el.dataset.gender === gender);
-    });
-  },
-
   updatePreview() {
     const initial = parseFloat(document.getElementById('initialWeight')?.value);
     const target = parseFloat(document.getElementById('targetWeight')?.value);
@@ -543,10 +526,6 @@ const App = {
       this.toast('请输入姓名');
       return;
     }
-    if (!this.selectedGender) {
-      this.toast('请选择性别');
-      return;
-    }
     if (!initialWeight || initialWeight < 20 || initialWeight > 300) {
       this.toast('初始体重应在 20-300kg 之间');
       return;
@@ -570,13 +549,11 @@ const App = {
 
     Storage.addParticipant(competitionId, {
       name,
-      gender: this.selectedGender,
       initialWeight,
       targetWeight,
       investment
     });
 
-    this.selectedGender = '';
     this.toast('添加成功');
     this.goBack();
   },
